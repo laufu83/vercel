@@ -12,20 +12,16 @@ const pool = mysql.createPool({
   password: process.env.TIDB_PASSWORD,
   database: process.env.TIDB_DATABASE,
   ssl: { rejectUnauthorized: false },
-  waitForConnections: true,
-  connectionLimit: 5,
-  queueLimit: 0
 });
 
-// 白名单
+// 表白名单
 const ALLOW_TABLES = ["vod_dytt", "vod_ffzy"];
-
 function isSafeTable(table) {
   return ALLOW_TABLES.includes(table);
 }
 
-// 列表
-app.get('/api/:tablename/list', async (req, res) => {
+// ================= 关键修复：去掉前面的 /api =================
+app.get('/:tablename/list', async (req, res) => {
   try {
     const { tablename } = req.params;
     if (!isSafeTable(tablename)) return res.json({ code: 0, msg: "表名不合法" });
@@ -37,7 +33,6 @@ app.get('/api/:tablename/list', async (req, res) => {
 
     let where = "WHERE 1=1";
     let params = [];
-
     if (type_id) {
       where += " AND type_id = ?";
       params.push(type_id);
@@ -47,31 +42,18 @@ app.get('/api/:tablename/list', async (req, res) => {
       `SELECT * FROM ${tablename} ${where} ORDER BY vod_time DESC LIMIT ? OFFSET ?`,
       [...params, size, offset]
     );
+    const [total] = await pool.query(`SELECT COUNT(*) AS count FROM ${tablename} ${where}`, params);
 
-    const [total] = await pool.query(
-      `SELECT COUNT(*) AS count FROM ${tablename} ${where}`,
-      params
-    );
-
-    res.json({
-      code: 1,
-      page,
-      size,
-      total: total[0].count,
-      data: rows
-    });
-
+    res.json({ code: 1, page, size, total: total[0].count, data: rows });
   } catch (err) {
     res.json({ code: 0, msg: err.message });
   }
 });
 
-// 详情
-app.get('/api/:tablename/detail', async (req, res) => {
+app.get('/:tablename/detail', async (req, res) => {
   try {
     const { tablename } = req.params;
     if (!isSafeTable(tablename)) return res.json({ code: 0, msg: "表名不合法" });
-
     const { vod_id } = req.query;
     if (!vod_id) return res.json({ code: 0, msg: "vod_id 不能为空" });
 
@@ -82,8 +64,7 @@ app.get('/api/:tablename/detail', async (req, res) => {
   }
 });
 
-// 搜索
-app.get('/api/:tablename/search', async (req, res) => {
+app.get('/:tablename/search', async (req, res) => {
   try {
     const { tablename } = req.params;
     if (!isSafeTable(tablename)) return res.json({ code: 0, msg: "表名不合法" });
@@ -98,12 +79,10 @@ app.get('/api/:tablename/search', async (req, res) => {
       `SELECT * FROM ${tablename} WHERE vod_name LIKE ? ORDER BY vod_time DESC LIMIT ? OFFSET ?`,
       [kw, size, offset]
     );
-
     res.json({ code: 1, keyword, data: rows });
   } catch (err) {
     res.json({ code: 0, msg: err.message });
   }
 });
 
-// Vercel 导出（必须保留）
 module.exports.handler = serverless(app);
