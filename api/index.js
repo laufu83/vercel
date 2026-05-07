@@ -1,7 +1,6 @@
 const express = require('express');
 const serverless = require('serverless-http');
 const mysql = require('mysql2/promise');
-require('dotenv').config(); // 加载 .env 文件
 
 const app = express();
 app.use(express.json());
@@ -18,14 +17,14 @@ const pool = mysql.createPool({
   queueLimit: 0
 });
 
-// 白名单，防止SQL注入
+// 白名单
 const ALLOW_TABLES = ["vod_dytt", "vod_ffzy"];
 
 function isSafeTable(table) {
   return ALLOW_TABLES.includes(table);
 }
 
-// 列表接口
+// 列表
 app.get('/api/:tablename/list', async (req, res) => {
   try {
     const { tablename } = req.params;
@@ -106,11 +105,5 @@ app.get('/api/:tablename/search', async (req, res) => {
   }
 });
 
-// ========== 本地启动 ==========
-if (require.main === module) {
-  app.listen(3000, () => {
-    console.log("本地测试：http://localhost:3000");
-  });
-}
-
+// Vercel 导出（必须保留）
 module.exports.handler = serverless(app);
