@@ -45,7 +45,10 @@ app.get('/api/:tablename/list', async (req, res) => {
     }
 
     const [rows] = await pool.query(
-      `SELECT * FROM ${tablename} ${where} ORDER BY vod_time DESC LIMIT ? OFFSET ?`,
+      `SELECT vod_id, type_id, type_name, type_id_1, vod_name, vod_sub, 
+        vod_en, vod_letter, vod_class, vod_pic, vod_actor, 
+        vod_director, vod_area, vod_lang, vod_year, 
+        vod_douban_id, vod_douban_score, vod_remarks, vod_score FROM ${tablename} ${where} ORDER BY vod_time DESC LIMIT ? OFFSET ?`,
       [...params, size, offset]
     );
 
@@ -96,7 +99,10 @@ app.get('/api/:tablename/search', async (req, res) => {
     const kw = `%${keyword}%`;
 
     const [rows] = await pool.query(
-      `SELECT * FROM ${tablename} WHERE vod_name LIKE ? ORDER BY vod_time DESC LIMIT ? OFFSET ?`,
+      `SELECT vod_id, type_id, type_name, type_id_1, vod_name, vod_sub, 
+        vod_en, vod_letter, vod_class, vod_pic, vod_actor, 
+        vod_director, vod_area, vod_lang, vod_year, 
+        vod_douban_id, vod_douban_score, vod_remarks, vod_score FROM ${tablename} WHERE vod_name LIKE ? ORDER BY vod_time DESC LIMIT ? OFFSET ?`,
       [kw, size, offset]
     );
 
