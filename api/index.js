@@ -105,5 +105,5 @@ app.get('/api/:tablename/search', async (req, res) => {
     res.json({ code: 0, msg: err.message });
   }
 });
-
+module.exports = app;
 module.exports.handler = serverless(app);
