@@ -63,7 +63,7 @@ let redisClient: ReturnType<typeof createClient> | null = null;
 let redisFailed = false;
 let connecting = false;
 
-async function getRedisClient() {
+export async function getRedisClient() {
   if (!redisEnabled) return null;
   if (redisFailed) return null;
   if (connecting) return null;
