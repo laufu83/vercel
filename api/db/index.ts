@@ -8,4 +8,6 @@ export const pool = mysql.createPool({
   password: process.env.TIDB_PASSWORD!,
   database: process.env.TIDB_DATABASE!,
   ssl: { rejectUnauthorized: false },
+  connectionLimit: 1,
+  connectTimeout: 5000, // 🔥 5 秒连不上就放弃
 });

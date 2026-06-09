@@ -1,9 +1,10 @@
 {
-  "name": "my-express-api",
-  "scripts": {
-    "dev": "npx tsx watch api/index.ts",
-    "start": "npx tsx api/index.ts"
-  },
+  "name": "my-movie-api",
+  "main": "index.ts",
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1",
+		"start": "node api/index.ts"
+	},
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "connect-redis": "^7.1.1",

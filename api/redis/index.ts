@@ -87,7 +87,7 @@ export async function getRedisClient() {
     const client = createClient({
       username,
       password,
-      socket: { host, port },
+      socket: { host, port,timeout: 5000 },
     });
 
     client.on('error', (err) => {
